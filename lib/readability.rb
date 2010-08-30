@@ -105,7 +105,7 @@ module Readability
 
     def score_paragraphs(min_content_score)
       candidates = {}
-      @html.css("p,td").each do |elem|
+      @html.css("p,td,li").each do |elem|
         parent_node = elem.parent
         grand_parent_node = parent_node.respond_to?(:parent) ? parent_node.parent : nil
         inner_text = elem.text
@@ -114,7 +114,7 @@ module Readability
         # Threshold for pure image content is eq. to IMAGE_AREA_THRESHOLD
         if options[:score_images]
           per_pixel_contribution = min_content_score.to_f/IMAGE_AREA_THRESHOLD;
-          elem.css('img').each do |e|
+          elem.css("img").each do |e|
             unless e[:width].blank? or e[:height].blank?
               content_length_score += e[:width].to_i * e[:height].to_i * per_pixel_contribution
             end
@@ -228,8 +228,8 @@ module Readability
         elem.remove
       end
 
-      # remove empty <p> tags
-      node.css("p").each do |elem|
+      # remove empty <p> and <div> tags
+      node.css("p,div").each do |elem|
         elem.remove if elem.content.strip.empty?
       end
 
