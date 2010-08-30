@@ -112,10 +112,8 @@ module Readability
         content_length_score = inner_text.length
 
         # Threshold for pure image content is eq. to IMAGE_AREA_THRESHOLD
-        debug "outside score_images branch"
         if options[:score_images]
-          debug "In score_images branch"
-          per_pixel_contribution = min_content_score/IMAGE_AREA_THRESHOLD;
+          per_pixel_contribution = min_content_score.to_f/IMAGE_AREA_THRESHOLD;
           elem.css('img').each do |e|
             unless e[:width].blank? or e[:height].blank?
               content_length_score += e[:width].to_i * e[:height].to_i * per_pixel_contribution
