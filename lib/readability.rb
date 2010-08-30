@@ -3,6 +3,7 @@ require 'nokogiri'
 
 module Readability
   class Document
+    IMAGE_AREA_THRESHOLD = 240000 # Eq. 600x400 image, if options[:score_images]
     TEXT_LENGTH_THRESHOLD = 25
     RETRY_LENGTH = 250
 
@@ -102,15 +103,26 @@ module Readability
       link_length / text_length.to_f
     end
 
-    def score_paragraphs(min_text_length)
+    def score_paragraphs(min_content_score)
       candidates = {}
       @html.css("p,td").each do |elem|
         parent_node = elem.parent
         grand_parent_node = parent_node.respond_to?(:parent) ? parent_node.parent : nil
         inner_text = elem.text
+        content_score = inner_text.length
 
-        # If this paragraph is less than 25 characters, don't even count it.
-        next if inner_text.length < min_text_length
+        # Threshold for pure image content is eq. to IMAGE_AREA_THRESHOLD
+        if options[:score_images]
+          per_pixel_contribution = min_content_score/IMAGE_AREA_THRESHOLD;
+          elem.css('img').each do |e|
+            unless e[:width].blank? or e[:height].blank?
+              content_score += e[:width].to_i * e[:height].to_i * per_pixel_contribution
+            end
+          end
+        end
+
+        # Remove paragraph if shorter than min text threshold, including images
+        next if content_score < min_content_score
 
         candidates[parent_node] ||= score_node(parent_node)
         candidates[grand_parent_node] ||= score_node(grand_parent_node) if grand_parent_node
