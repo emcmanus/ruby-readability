@@ -3,7 +3,7 @@ require 'nokogiri'
 
 module Readability
   class Document
-    IMAGE_AREA_THRESHOLD = 80000 # Every 80,000 pixels contributes TEXT_LENGTH_THRESHOLD to the node length score
+    IMAGE_AREA_THRESHOLD = 1000 # Every 80,000 pixels contributes TEXT_LENGTH_THRESHOLD to the node length score
     TEXT_LENGTH_THRESHOLD = 25
     RETRY_LENGTH = 250
 
