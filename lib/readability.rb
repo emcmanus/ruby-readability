@@ -109,27 +109,27 @@ module Readability
         parent_node = elem.parent
         grand_parent_node = parent_node.respond_to?(:parent) ? parent_node.parent : nil
         inner_text = elem.text
-        content_score = inner_text.length
+        content_length_score = inner_text.length
 
         # Threshold for pure image content is eq. to IMAGE_AREA_THRESHOLD
         if options[:score_images]
           per_pixel_contribution = min_content_score/IMAGE_AREA_THRESHOLD;
           elem.css('img').each do |e|
             unless e[:width].blank? or e[:height].blank?
-              content_score += e[:width].to_i * e[:height].to_i * per_pixel_contribution
+              content_length_score += e[:width].to_i * e[:height].to_i * per_pixel_contribution
             end
           end
         end
 
         # Remove paragraph if shorter than min text threshold, including images
-        next if content_score < min_content_score
+        next if content_length_score < min_content_score
 
         candidates[parent_node] ||= score_node(parent_node)
         candidates[grand_parent_node] ||= score_node(grand_parent_node) if grand_parent_node
 
         content_score = 1
         content_score += inner_text.split(',').length
-        content_score += [(inner_text.length / 100).to_i, 3].min
+        content_score += [(content_length_score / 100).to_i, 3].min
 
         candidates[parent_node][:content_score] += content_score
         candidates[grand_parent_node][:content_score] += content_score / 2.0 if grand_parent_node
