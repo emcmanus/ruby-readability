@@ -311,14 +311,18 @@ module Readability
               end
             end
           end
+          debug "set rel"
           if el and el.node_name == "a" and options[:sanitize_links]
             el.set_attribute "rel", "nofollow"
           end
+          debug "check for empty a or img"
           if el and (el.keys.length == 0 or el.keys == ["rel"])
             # Empty a or img
             if el.content.strip.empty?
+              debug "removing empty el"
               el.remove
             else
+              debug "swapping empty el"
               el.swap(el.text)
             end
           end
@@ -326,7 +330,7 @@ module Readability
           # Otherwise, replace the element with its contents
           el.swap(el.text)
         end
-
+        debug "FINISHED LOOP"
       end
 
       # Get rid of duplicate whitespace
