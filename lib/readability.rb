@@ -320,7 +320,7 @@ module Readability
             el.set_attribute "rel", "nofollow"
           end
           debug "check for empty a or img"
-          if el and (el.keys.length == 0 or el.keys == ["rel"])
+          if el and (el.node_name == "a" or el.node_name == "img") and (el.keys.length == 0 or el.keys == ["rel"])
             # Empty a or img
             if el.content.strip.empty?
               debug "removing empty el"
