@@ -335,25 +335,25 @@ module Readability
           source_root += "#{source.userinfo}@" unless source.userinfo.nil?
           source_root += "#{source.host}"
           source_root += ":#{source.port}" unless source.port == 80
-        
+          
           dir_path = source.path.split("/")
           dir_path.pop
           dir_path = "#{source_root}#{dir_path.join '/'}/"
-        
+          
           debug "source root: #{source_root}, dir_path = #{dir_path}"
-        
+          
           # Determine path type
-          if value.index '/' == 0
+          if value.index('/') == 0
             debug "root path"
             # Relative to Root
             value = source_root + value
           elsif value.index('http://').nil?
             debug "relative to directory"
             # Either malformed or relative to directory
-            value = dir_path + value if validates_url(dir_path + value)
+            value = (dir_path + value) if validates_url(dir_path + value)
           end
         rescue => err
-          debug "Invalid url encountered in scope resolver: #{value}. Error: #{err}. More: #{$!}"
+          debug "Error: #{err}"
         end
       end
       debug "returning #{value}"
