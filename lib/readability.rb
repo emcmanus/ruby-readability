@@ -50,7 +50,7 @@ module Readability
         make_html
         content(false)
       else
-        debug "Branch 2"
+        debug "Branch 2. Returning #{cleaned_article.length} bytes"
         cleaned_article
       end
     end
