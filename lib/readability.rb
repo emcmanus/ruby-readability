@@ -44,10 +44,13 @@ module Readability
       article = get_article(candidates, best_candidate)
 
       cleaned_article = sanitize(article, candidates, options)
+      debug "finished cleaning article"
       if remove_unlikely_candidates && article.text.strip.length < (options[:retry_length] || RETRY_LENGTH)
+        debug "Branch 1"
         make_html
         content(false)
       else
+        debug "Branch 2"
         cleaned_article
       end
     end
@@ -335,6 +338,7 @@ module Readability
 
       # Get rid of duplicate whitespace
       node.to_html.gsub(/[\r\n\f]+/, "\n" ).gsub(/[\t ]+/, " ").gsub(/&nbsp;/, " ")
+      debug "RETURNING FROM SANITIZE"
     end
     
     def resolve_relative_url(value)
