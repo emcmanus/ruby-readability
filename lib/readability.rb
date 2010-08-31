@@ -372,7 +372,7 @@ module Readability
           raise(URI::InvalidURIError)
         end
 
-      rescue URI::InvalidURIError => e
+      rescue
         return false
       end
       return true
