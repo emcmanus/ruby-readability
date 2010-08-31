@@ -337,7 +337,7 @@ module Readability
           source_root += ":#{source.port}" unless source.port == 80
           
           dir_path = source.path.split("/")
-          dir_path.pop
+          dir_path.pop unless (source.path.last == "/")
           dir_path = "#{source_root}#{dir_path.join '/'}/"
           
           debug "source root: #{source_root}, dir_path = #{dir_path}"
