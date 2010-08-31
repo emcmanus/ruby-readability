@@ -337,10 +337,11 @@ module Readability
         end
         debug "FINISHED LOOP"
       end
-
+      
+      debug "RETURNING FROM SANITIZE"
+      
       # Get rid of duplicate whitespace
       node.to_html.gsub(/[\r\n\f]+/, "\n" ).gsub(/[\t ]+/, " ").gsub(/&nbsp;/, " ")
-      debug "RETURNING FROM SANITIZE"
     end
     
     def resolve_relative_url(value)
