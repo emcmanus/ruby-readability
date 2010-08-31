@@ -263,7 +263,7 @@ module Readability
             reason = "too many images"
             # If we allow weighting for images, lets be lenient
             if options[:score_images]
-              to_remove = true if counts["img"] > (counts["p"] * 2)
+              # to_remove = true if counts["img"] > (counts["p"] * 2)
             else
               to_remove = true
             end
