@@ -46,6 +46,7 @@ module Readability
       cleaned_article = sanitize(article, candidates, options)
       debug "finished cleaning article, remove_unlikely_candidates = #{remove_unlikely_candidates}"
       debug "length test: #{article.text.strip.length}"
+      debug "here"
       if remove_unlikely_candidates && article.text.strip.length < (options[:retry_length] || RETRY_LENGTH)
         debug "Branch 1"
         make_html
