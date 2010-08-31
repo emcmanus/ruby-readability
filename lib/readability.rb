@@ -303,9 +303,10 @@ module Readability
           el.attributes.each do |a, x|
             el.delete(a) unless @options[:attributes] && @options[:attributes].include?(a.to_s)
             if options[:sanitize_links] and (a == "href" or a == "src")
+              el.set_attribute a, resolve_relative_url(el.attribute a)
               unless validates_url el.attribute(a)
                 debug "Removed invalid URL: #{el.attribute a}"
-                el.set_attribute a, "\#"
+                el.delete a
                 break
               end
             end
@@ -322,6 +323,34 @@ module Readability
 
       # Get rid of duplicate whitespace
       node.to_html.gsub(/[\r\n\f]+/, "\n" ).gsub(/[\t ]+/, " ").gsub(/&nbsp;/, " ")
+    end
+    
+    def resolve_relative_url(value)
+      unless value.blank? or value.index('http://')==0 or options[:resolve_relative_urls_with_path].blank?
+        source = URI.parse options[:resolve_relative_urls_with_path]
+        source_root = "#{source.scheme}://"
+        source_root += "#{source.userinfo}@" unless source.userinfo.nil?
+        source_root += "#{source.host}"
+        source_root += ":#{source.port}" unless source.port == 80
+        
+        dir_path = source.path.split("/")
+        dir_path.pop
+        dir_path = "#{source_root}#{dir_path.join '/'}/"
+        
+        # Determine path type
+        if value.index '/' == 0
+          # Relative to Root
+          value = source_root + value
+        elsif value.index('http://').nil?
+          begin
+            # Either malformed or relative to directory
+            value = dir_path + value if validates_url(dir_path + value)
+          rescue URI::InvalidURIError => e
+            debug "Invalid url encountered in scope resolver: #{value}."
+          end
+        end
+      end
+      value
     end
     
     def validates_url(value)
