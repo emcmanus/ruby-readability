@@ -302,10 +302,10 @@ module Readability
         if whitelist[el.node_name]
           el.attributes.each do |a, x|
             el.delete(a) unless @options[:attributes] && @options[:attributes].include?(a.to_s)
-            if el.node_name == "a" and a == "href" and options[:sanitize_links]
+            if options[:sanitize_links] and (a == "href" or a == "src")
               unless validates_url el.attribute(a)
-                debug "Removed invalid link: #{el.attribute a}"
-                el.swap(el.text)
+                debug "Removed invalid URL: #{el.attribute a}"
+                el.set_attribute a, "\#"
                 break
               end
             end
