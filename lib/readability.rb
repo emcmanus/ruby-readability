@@ -195,7 +195,7 @@ module Readability
     end
 
     def debug(str)
-      logger.warn str if options[:debug]
+      puts str if options[:debug]
     end
 
     def remove_unlikely_candidates!
