@@ -3,7 +3,7 @@ require 'nokogiri'
 
 module Readability
   class Document
-    IMAGE_AREA_THRESHOLD = 500 # Every 80,000 pixels contributes TEXT_LENGTH_THRESHOLD to the node length score
+    IMAGE_AREA_THRESHOLD = 80000 # Every 80,000 pixels contributes TEXT_LENGTH_THRESHOLD to the node length score
     TEXT_LENGTH_THRESHOLD = 25
     RETRY_LENGTH = 250
 
@@ -114,12 +114,14 @@ module Readability
         # Threshold for pure image content is eq. to IMAGE_AREA_THRESHOLD
         if options[:score_images]
           per_pixel_contribution = min_content_score.to_f/IMAGE_AREA_THRESHOLD;
+          node_image_contribution = 0
           elem.css("img").each do |e|
             unless e[:width].blank? or e[:height].blank?
-              content_length_score += e[:width].to_i * e[:height].to_i * per_pixel_contribution
+              node_image_contribution += [e[:width].to_i*e[:height].to_i*per_pixel_contribution, 8*min_content_score].min
             end
           end
-          debug "Images contributed #{content_length_score - inner_text.length} pts to #{elem.name}##{elem[:id]}.#{elem[:class]}"
+          content_length_score += node_image_contribution
+          debug "Images contributed #{node_contribution} pts to #{elem.name}##{elem[:id]}.#{elem[:class]}"
         end
 
         # Remove paragraph if shorter than min text threshold, including images
@@ -130,8 +132,9 @@ module Readability
 
         content_score = 1
         content_score += inner_text.split(',').length
-        content_score += [(content_length_score / 100).to_i, 3].min
-
+        content_score += [(inner_text.length / 100).to_i, 3].min
+        content_score += node_image_contribution
+        
         candidates[parent_node][:content_score] += content_score
         candidates[grand_parent_node][:content_score] += content_score / 2.0 if grand_parent_node
       end
