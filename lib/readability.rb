@@ -197,13 +197,17 @@ module Readability
     end
 
     def remove_unlikely_candidates!
+      debug "in remove_unlikely_candidates"
       @html.css("*").each do |elem|
+        debug "start"
         str = "#{elem[:class]}#{elem[:id]}"
         if str =~ REGEXES[:unlikelyCandidatesRe] && str !~ REGEXES[:okMaybeItsACandidateRe] && elem.name.downcase != 'body'
           debug("Removing unlikely candidate - #{str}")
           elem.remove
         end
+        debug "end"
       end
+      debug "leaving remove_unlikely_candidates"
     end
 
     def transform_misused_divs_into_paragraphs!
