@@ -352,7 +352,7 @@ module Readability
             # Either malformed or relative to directory
             value = dir_path + value if validates_url(dir_path + value)
           end
-        rescue URI::InvalidURIError => e
+        rescue
           debug "Invalid url encountered in scope resolver: #{value}."
         end
       end
