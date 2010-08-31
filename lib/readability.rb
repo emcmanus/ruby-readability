@@ -255,8 +255,13 @@ module Readability
           reason = ""
 
           if counts["img"] > counts["p"]
-            reason = "too many images (has #{counts['img']} images and #{counts['p']} paragraphs)"
-            to_remove = true
+            reason = "too many images"
+            # If we allow weighting for images, lets be lenient
+            if options[:score_images]
+              to_remove = true if counts["img"] > (counts["p"] * 2)
+            else
+              to_remove = true
+            end
           elsif counts["li"] > counts["p"] && name != "ul" && name != "ol"
             reason = "more <li>s than <p>s"
             to_remove = true
