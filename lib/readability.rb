@@ -133,7 +133,7 @@ module Readability
         content_score = 1
         content_score += inner_text.split(',').length
         content_score += [(inner_text.length / 100).to_i, 3].min
-        content_score += node_image_contribution
+        content_score += node_image_contribution/5
         
         candidates[parent_node][:content_score] += content_score
         candidates[grand_parent_node][:content_score] += content_score / 2.0 if grand_parent_node
@@ -255,7 +255,7 @@ module Readability
           reason = ""
 
           if counts["img"] > counts["p"]
-            reason = "too many images"
+            reason = "too many images (has #{counts['img']} images and #{counts['p']} paragraphs)"
             to_remove = true
           elsif counts["li"] > counts["p"] && name != "ul" && name != "ol"
             reason = "more <li>s than <p>s"
