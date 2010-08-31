@@ -50,10 +50,10 @@ module Readability
       if remove_unlikely_candidates && article.text.strip.length < (options[:retry_length] || RETRY_LENGTH)
         debug "Branch 1"
         make_html
-        content(false)
+        return content(false)
       else
         debug "Branch 2. Returning #{cleaned_article.length} bytes"
-        cleaned_article
+        return cleaned_article
       end
     end
 
