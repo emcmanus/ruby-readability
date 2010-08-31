@@ -352,8 +352,8 @@ module Readability
             # Either malformed or relative to directory
             value = dir_path + value if validates_url(dir_path + value)
           end
-        rescue
-          debug "Invalid url encountered in scope resolver: #{value}."
+        rescue => err
+          debug "Invalid url encountered in scope resolver: #{value}. Error: #{err}"
         end
       end
       debug "returning #{value}"
