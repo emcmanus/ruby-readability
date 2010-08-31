@@ -121,7 +121,7 @@ module Readability
             end
           end
           content_length_score += node_image_contribution
-          debug "Images contributed #{node_contribution} pts to #{elem.name}##{elem[:id]}.#{elem[:class]}"
+          debug "Images contributed #{node_image_contribution} pts to #{elem.name}##{elem[:id]}.#{elem[:class]}"
         end
 
         # Remove paragraph if shorter than min text threshold, including images
