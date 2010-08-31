@@ -353,7 +353,7 @@ module Readability
             value = dir_path + value if validates_url(dir_path + value)
           end
         rescue => err
-          debug "Invalid url encountered in scope resolver: #{value}. Error: #{err}"
+          debug "Invalid url encountered in scope resolver: #{value}. Error: #{err}. More: #{$!}"
         end
       end
       debug "returning #{value}"
