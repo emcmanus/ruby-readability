@@ -303,7 +303,7 @@ module Readability
           el.attributes.each do |a, x|
             el.delete(a) unless @options[:attributes] && @options[:attributes].include?(a.to_s)
             if options[:sanitize_links] and (a == "href" or a == "src")
-              el.set_attribute a, resolve_relative_url(el.attribute a)
+              el.set_attribute a, resolve_relative_url(el.attribute(a).value)
               unless validates_url el.attribute(a)
                 debug "Removed invalid URL: #{el.attribute a}"
                 el.delete a
