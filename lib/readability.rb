@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'nokogiri'
+require 'uri/http'
 
 module Readability
   class Document
@@ -299,10 +300,17 @@ module Readability
 
         # If element is in whitelist, delete all its attributes
         if whitelist[el.node_name]
-          el.attributes.each { |a, x| el.delete(a) unless @options[:attributes] && @options[:attributes].include?(a.to_s) }
-
-          # Otherwise, replace the element with its contents
+          el.attributes.each do |a, x|
+            el.delete(a) unless @options[:attributes] && @options[:attributes].include?(a.to_s)
+            if el.node_name == "a" and a == "href" and options[:sanitize_links]
+              unless validates_url el.attribute(a)
+                debug "Removed invalid href value: #{el.attribute a}"
+                el.delete(a)
+              end
+            end
+          end
         else
+          # Otherwise, replace the element with its contents
           el.swap(el.text)
         end
 
@@ -310,6 +318,24 @@ module Readability
 
       # Get rid of duplicate whitespace
       node.to_html.gsub(/[\r\n\f]+/, "\n" ).gsub(/[\t ]+/, " ").gsub(/&nbsp;/, " ")
+    end
+    
+    def validates_url(value)
+      begin
+        uri = URI.parse(value)
+
+        if !%w[http https].include?(uri.scheme)
+          raise(URI::InvalidURIError)
+        end
+
+        if [:scheme, :host].any? { |i| uri.send(i).blank? }
+          raise(URI::InvalidURIError)
+        end
+
+      rescue URI::InvalidURIError => e
+        return false
+      end
+      return true
     end
 
   end
