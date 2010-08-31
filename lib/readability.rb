@@ -314,6 +314,14 @@ module Readability
           if el and el.node_name == "a" and options[:sanitize_links]
             el.set_attribute "rel", "nofollow"
           end
+          if el and (el.keys.length == 0 or el.keys == ["rel"])
+            # Empty a or img
+            if el.content.strip.empty?
+              el.remove
+            else
+              el.swap(el.text)
+            end
+          end
         else
           # Otherwise, replace the element with its contents
           el.swap(el.text)
