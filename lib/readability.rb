@@ -304,10 +304,14 @@ module Readability
             el.delete(a) unless @options[:attributes] && @options[:attributes].include?(a.to_s)
             if el.node_name == "a" and a == "href" and options[:sanitize_links]
               unless validates_url el.attribute(a)
-                debug "Removed invalid href value: #{el.attribute a}"
-                el.delete(a)
+                debug "Removed invalid link: #{el.attribute a}"
+                el.swap(el.text)
+                break
               end
             end
+          end
+          if el and el.node_name == "a" and options[:sanitize_links]
+            el.set_attribute "rel", "nofollow"
           end
         else
           # Otherwise, replace the element with its contents
