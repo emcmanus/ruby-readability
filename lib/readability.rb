@@ -338,6 +338,7 @@ module Readability
           begin
             text_representation = el.text
             debug "WARN text_representation is #{text_representation}"
+            debug "---- element is #{el.inspect}"
           rescue
             debug "WARN: Caught in the trap!!"
             text_representation = ""
