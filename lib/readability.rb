@@ -252,7 +252,7 @@ module Readability
 
       # remove empty <p> and <div> tags
       node.css("p,div").each do |elem|
-        elem.remove if elem.content.strip.empty?
+        elem.remove if elem.inner_html.strip.empty?
       end
 
       # Conditionally clean <table>s, <ul>s, and <div>s
