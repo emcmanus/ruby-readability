@@ -4,7 +4,7 @@ require 'uri/http'
 
 module Readability
   class Document
-    IMAGE_AREA_THRESHOLD = 80000 # Every 80,000 pixels contributes TEXT_LENGTH_THRESHOLD to the node length score
+    IMAGE_AREA_THRESHOLD = 50000 # Every 50,000 pixels contributes TEXT_LENGTH_THRESHOLD to the node length score
     TEXT_LENGTH_THRESHOLD = 25
     RETRY_LENGTH = 250
 
@@ -139,7 +139,7 @@ module Readability
         content_score = 1
         content_score += inner_text.split(',').length
         content_score += [(inner_text.length / 100).to_i, 3].min
-        content_score += node_image_contribution/5
+        content_score += node_image_contribution
         
         candidates[parent_node][:content_score] += content_score
         candidates[grand_parent_node][:content_score] += content_score / 2.0 if grand_parent_node
