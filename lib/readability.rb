@@ -116,6 +116,7 @@ module Readability
         grand_parent_node = parent_node.respond_to?(:parent) ? parent_node.parent : nil
         inner_text = elem.text
         content_length_score = inner_text.length
+        node_image_contribution = 0
 
         # Threshold for pure image content is eq. to IMAGE_AREA_THRESHOLD
         if options[:score_images]
