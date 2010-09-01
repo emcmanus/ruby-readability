@@ -338,6 +338,7 @@ module Readability
           begin
             text_representation = el.text
           rescue
+            debug "WARN: Caught in the trap!!"
             text_representation = ""
           end
           el.swap(text_representation)
