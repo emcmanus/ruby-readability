@@ -133,8 +133,11 @@ module Readability
           per_pixel_contribution = min_content_score.to_f/IMAGE_AREA_THRESHOLD;
           node_image_contribution = 0
           elem.css("img").each do |e|
-            unless e[:width].blank? or e[:height].blank?
-              node_image_contribution += [e[:width].to_i*e[:height].to_i*per_pixel_contribution, 8*min_content_score].min
+            # Let's make sure we have the right data here
+            if !e[:width].nil? and !e[:height].nil?
+              if e[:width].to_i > 0 and e[:height].to_i > 0
+                node_image_contribution += [e[:width].to_i*e[:height].to_i*per_pixel_contribution, 8*min_content_score].min
+              end
             end
           end
           content_length_score += node_image_contribution
