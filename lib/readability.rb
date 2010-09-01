@@ -44,14 +44,10 @@ module Readability
       article = get_article(candidates, best_candidate)
 
       cleaned_article = sanitize(article, candidates, options)
-      debug "finished cleaning article, remove_unlikely_candidates = #{remove_unlikely_candidates}"
-      debug "length test: #{article.text.strip.length}"
       if remove_unlikely_candidates && article.text.strip.length < (options[:retry_length] || RETRY_LENGTH)
-        debug "Branch 1"
         make_html
         return content(false)
       else
-        debug "Branch 2. Returning #{cleaned_article.inspect} bytes"
         return cleaned_article
       end
     end
@@ -209,10 +205,11 @@ module Readability
 
     def transform_misused_divs_into_paragraphs!
       @html.css("*").each do |elem|
+        debug("Testing ##{elem[:id]}.#{elem[:class]} for p transformation");
         if elem.name.downcase == "div"
           # transform <div>s that do not contain other block elements into <p>s
           if elem.inner_html !~ REGEXES[:divToPElementsRe]
-            debug("Altering div(##{elem[:id]}.#{elem[:class]}) to p");
+            debug("Transforming div(##{elem[:id]}.#{elem[:class]}) to p");
             elem.name = "p"
           end
         else
@@ -315,18 +312,16 @@ module Readability
               end
             end
           end
-          debug "set rel"
           if el and el.node_name == "a" and options[:sanitize_links]
             el.set_attribute "rel", "nofollow"
           end
-          debug "check for empty a or img"
           if el and (el.node_name == "a" or el.node_name == "img") and (el.keys.length == 0 or el.keys == ["rel"])
             # Empty a or img
             if el.content.strip.empty?
-              debug "removing empty el"
+              debug "A or IMG ##{el[:id]}.#{el[:class]} empty, removing element"
               el.remove
             else
-              debug "swapping empty el"
+              debug "A or IMG ##{el[:id]}.#{el[:class]} not empty, but tag is useless, swapping with text"
               el.swap(el.text)
             end
           end
@@ -334,19 +329,15 @@ module Readability
           # Otherwise, replace the element with its contents
           el.swap(el.text)
         end
-        debug "FINISHED LOOP"
       end
-      
-      debug "RETURNING FROM SANITIZE"
       
       # Get rid of duplicate whitespace
       node.to_html.gsub(/[\r\n\f]+/, "\n" ).gsub(/[\t ]+/, " ").gsub(/&nbsp;/, " ")
     end
     
     def resolve_relative_url(value)
-      debug "Entered resolve_relative_url with value: #{value.inspect}"
+      debug_input_val = value
       unless value.blank? or value.index('http://')==0 or options[:resolve_relative_urls_with_path].blank?
-        debug "Entered branch 1"
         begin
           source = URI.parse options[:resolve_relative_urls_with_path]
           source_root = "#{source.scheme}://"
@@ -358,15 +349,11 @@ module Readability
           dir_path.pop unless (source.path.last == "/")
           dir_path = "#{source_root}#{dir_path.join '/'}/"
           
-          debug "source root: #{source_root}, dir_path = #{dir_path}"
-          
           # Determine path type
           if value.index('/') == 0
-            debug "root path"
             # Relative to Root
             value = source_root + value
           elsif value.index('http://').nil?
-            debug "relative to directory"
             # Either malformed or relative to directory
             value = (dir_path + value) if validates_url(dir_path + value)
           end
@@ -374,7 +361,7 @@ module Readability
           debug "Error: #{err}"
         end
       end
-      debug "returning #{value}"
+      debug "Transformed URL: #{debug_input_val} -> #{value}"
       value
     end
     
