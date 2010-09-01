@@ -332,25 +332,6 @@ module Readability
           if el.node_name == "a" and options[:sanitize_links]
             el.set_attribute "rel", "nofollow"
           end
-          
-          # In the following section you'll see a few children checks. We want to make sure
-          # we don't remove any elements that are still in the css() array above
-          
-          # <img> has no src
-          if el.node_name == "img" and el[:src].blank? and el.children.length == 0
-            debug "<IMG> ##{el[:id]}.#{el[:class]} empty, removing"
-            el.remove
-          end
-          # <a> isnt' a useful anchor
-          if el and el.node_name == "a" and el[:href].blank? and el[:name].blank?
-            if el.content.strip.empty? and el.children.length == 0
-              debug "<A> ##{el[:id]}.#{el[:class]} empty, removing"
-              el.remove
-            elsif el.children.length == 0
-              debug "<A> ##{el[:id]}.#{el[:class]} inactive, swapping with text"
-              el.swap(el.text)
-            end
-          end
         else
           # Otherwise, replace the element with its contents
           unless el.children.nil?
@@ -360,6 +341,30 @@ module Readability
             debug "BUG: Invalid element trap."
             # Element invalidated elsewhere
             el.remove unless el.nil?
+          end
+        end
+      end
+      
+      
+      # Simple Source Cleanup
+      
+      node.css("img").each do |el|
+        if el[:src].blank? and el.children.length == 0
+          # <img> has no src
+          debug "<IMG> ##{el[:id]}.#{el[:class]} empty, removing"
+          el.remove
+        end
+      end
+      
+      node.css("a").each do |el|
+        if el[:href].blank? and el[:name].blank?
+          # <a> isnt' a useful anchor
+          if el.content.strip.empty? and el.children.length == 0
+            debug "<A> ##{el[:id]}.#{el[:class]} empty, removing"
+            el.remove
+          elsif el.children.length == 0
+            debug "<A> ##{el[:id]}.#{el[:class]} inactive, swapping with text"
+            el.swap(el.text)
           end
         end
       end
