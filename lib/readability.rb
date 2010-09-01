@@ -334,16 +334,12 @@ module Readability
           end
         else
           # Attempt to get text. If the element has invalid children, replace with ""
-          text_representation = ""
           begin
-            text_representation = el.text
-            debug "WARN text_representation is #{text_representation}"
-            debug "---- element is #{el.inspect}"
+            el.swap(el.text)
           rescue
             debug "WARN: Caught in the trap!!"
-            text_representation = ""
+            el.swap("")
           end
-          el.swap(text_representation)
         end
       end
       
