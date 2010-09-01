@@ -93,13 +93,6 @@ module Readability
     end
 
     def select_best_candidate(candidates)
-      debug "Content score inspections"
-      candidates.values.each do |c|
-        # debug "#{c[:content_score].inspect}"
-        if "#{c[:content_score].inspect}" == "NaN"
-          debug "BAD VALUE: #{c.inspect}"
-        end
-      end
       sorted_candidates = candidates.values.sort { |a, b| b[:content_score] <=> a[:content_score] }
 
       debug("Top 5 canidates:")
@@ -115,7 +108,7 @@ module Readability
 
     def get_link_density(elem)
       link_length = elem.css("a").map {|i| i.text}.join("").length
-      text_length = elem.text.length
+      text_length = elem.text.length + 1    # Prevent division by 0, resulting in NaN
       link_length / text_length.to_f
     end
 
@@ -139,8 +132,6 @@ module Readability
           end
           content_length_score += node_image_contribution
           debug "Images contributed #{node_image_contribution} pts to #{elem.name}##{elem[:id]}.#{elem[:class]}"
-          
-          debug "NaN encountered at 1, #{elem.name}##{elem[:id]}.#{elem[:class]}" if content_length_score.to_f.nan?
         end
 
         # Remove paragraph if shorter than min text threshold, including images
@@ -155,17 +146,13 @@ module Readability
         content_score += node_image_contribution
         
         candidates[parent_node][:content_score] += content_score
-        debug "NaN encountered at 4, #{parent_node.name}##{parent_node[:id]}.#{parent_node[:class]}" if candidates[parent_node][:content_score].to_f.nan?
         candidates[grand_parent_node][:content_score] += content_score / 2.0 if grand_parent_node
-        debug "NaN encountered at 5, #{grand_parent_node.name}##{grand_parent_node[:id]}.#{grand_parent_node[:class]}" if grand_parent_node and candidates[grand_parent_node][:content_score].to_f.nan?
       end
 
       # Scale the final candidates score based on link density. Good content should have a
       # relatively small link density (5% or less) and be mostly unaffected by this operation.
       candidates.each do |elem, candidate|
-        debug "NaN encountered at 2, #{elem.name}##{elem[:id]}.#{elem[:class]}" if candidate[:content_score].to_f.nan?
         candidate[:content_score] = candidate[:content_score] * (1 - get_link_density(elem))
-        debug "NaN encountered at 3, #{elem.name}##{elem[:id]}.#{elem[:class]}" if candidate[:content_score].to_f.nan?
       end
       
       candidates
