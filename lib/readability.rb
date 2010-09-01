@@ -96,7 +96,7 @@ module Readability
       sorted_candidates = candidates.values.sort do |a, b|
         begin
           b[:content_score] <=> a[:content_score]
-        rescue
+        rescue => e
           debug "At the error! Comparing #{b[:content_score].inspect} with #{a[:content_score].inspect}"
         end
       end
