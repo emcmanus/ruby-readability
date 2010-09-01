@@ -155,7 +155,7 @@ module Readability
         candidate[:content_score] = candidate[:content_score] * (1 - get_link_density(elem))
       end
       
-      debug "Candidates: #{candiates.inspect}"
+      debug "Candidates: #{candidates.inspect}"
       
       candidates
     end
