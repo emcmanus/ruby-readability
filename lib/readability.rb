@@ -332,13 +332,18 @@ module Readability
           if el and el.node_name == "a" and options[:sanitize_links]
             el.set_attribute "rel", "nofollow"
           end
-          if el and (el.node_name == "a" or el.node_name == "img") and (el.keys.length == 0 or el.keys == ["rel"])
-            # Empty a or img
+          # <img> has no src
+          if el and el.node_name == "img" and el[:src].blank?
+            debug "<IMG> ##{el[:id]}.#{el[:class]} empty, removing"
+            el.remove
+          end
+          # <a> isnt' a useful anchor
+          if el and el.node_name == "a" and el[:href].blank? and el[:name].blank?
             if el.content.strip.empty?
-              debug "A or IMG ##{el[:id]}.#{el[:class]} empty, removing element"
+              debug "<A> ##{el[:id]}.#{el[:class]} empty, removing"
               el.remove
             else
-              debug "A or IMG ##{el[:id]}.#{el[:class]} not empty, but tag is useless, swapping with text"
+              debug "<A> ##{el[:id]}.#{el[:class]} inactive, swapping with text"
               el.swap(el.text)
             end
           end
