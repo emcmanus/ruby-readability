@@ -43,6 +43,9 @@ module Readability
       @html.css("script, style").each { |i| i.remove }
 
       remove_unlikely_candidates! if remove_unlikely_candidates
+      if options[:score_images]
+        wrap_every_img_in_p!
+      end
       transform_misused_divs_into_paragraphs!
       candidates = score_paragraphs(options[:min_text_length] || TEXT_LENGTH_THRESHOLD)
       best_candidate = select_best_candidate(candidates)
@@ -228,7 +231,16 @@ module Readability
         end
       end
     end
-
+    
+    def wrap_every_img_in_p!
+      @html.css("img").each do |elem|
+        # don't want to aler elements we may operate on later, e.g. the case <img><img/></img>
+        if elem.children.length == 0
+          elem.swap "<p>#{elem.to_html}</p>"
+        end
+      end
+    end
+    
     def sanitize(node, candidates, options = {})
       node.css("h1, h2, h3, h4, h5, h6").each do |header|
         header.remove if class_weight(header) < 0 || get_link_density(header) > 0.33
