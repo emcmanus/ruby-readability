@@ -93,7 +93,10 @@ module Readability
     end
 
     def select_best_candidate(candidates)
-      debug "candidate values: #{candidates.values.inspect}"
+      debug "Content score inspections"
+      candidates.values.each do |c|
+        debug c[:content_score].inspect
+      end
       sorted_candidates = candidates.values.sort { |a, b| b[:content_score] <=> a[:content_score] }
 
       debug("Top 5 canidates:")
