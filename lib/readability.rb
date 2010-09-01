@@ -329,27 +329,38 @@ module Readability
               end
             end
           end
-          if el and el.node_name == "a" and options[:sanitize_links]
+          if el.node_name == "a" and options[:sanitize_links]
             el.set_attribute "rel", "nofollow"
           end
+          
+          # In the following section you'll see a few children checks. We want to make sure
+          # we don't remove any elements that are still in the css() array above
+          
           # <img> has no src
-          if el and el.node_name == "img" and el[:src].blank?
+          if el.node_name == "img" and el[:src].blank? and el.children.length == 0
             debug "<IMG> ##{el[:id]}.#{el[:class]} empty, removing"
             el.remove
           end
           # <a> isnt' a useful anchor
           if el and el.node_name == "a" and el[:href].blank? and el[:name].blank?
-            if el.content.strip.empty?
+            if el.content.strip.empty? and el.children.length == 0
               debug "<A> ##{el[:id]}.#{el[:class]} empty, removing"
               el.remove
-            else
+            elsif el.children.length == 0
               debug "<A> ##{el[:id]}.#{el[:class]} inactive, swapping with text"
               el.swap(el.text)
             end
           end
         else
           # Otherwise, replace the element with its contents
-          el.swap(el.text)
+          unless el.children.nil?
+            # Still a valid element
+            el.swap(el.text)
+          else
+            debug "BUG: Invalid element trap."
+            # Element invalidated elsewhere
+            el.remove unless el.nil?
+          end
         end
       end
       
