@@ -207,6 +207,11 @@ module Readability
       @html.css("*").each do |elem|
         if elem.name.downcase == "div"
           debug("Testing DIV ##{elem[:id]}.#{elem[:class]} for p transformation");
+          if elem[:class] == "post-content"
+            debug elem.inner_html
+            debug "regex result? #{elem.inner_html !~ REGEXES[:divToPElementsRe]}"
+            debug "end"
+          end
           # transform <div>s that do not contain other block elements into <p>s
           if elem.inner_html !~ REGEXES[:divToPElementsRe]
             debug("Transforming div(##{elem[:id]}.#{elem[:class]}) to p");
