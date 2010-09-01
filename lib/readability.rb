@@ -93,6 +93,7 @@ module Readability
     end
 
     def select_best_candidate(candidates)
+      debug "candidate values: #{candidates.values.inspect}"
       sorted_candidates = candidates.values.sort { |a, b| b[:content_score] <=> a[:content_score] }
 
       debug("Top 5 canidates:")
@@ -154,8 +155,6 @@ module Readability
       candidates.each do |elem, candidate|
         candidate[:content_score] = candidate[:content_score] * (1 - get_link_density(elem))
       end
-      
-      debug "Candidates: #{candidates.inspect}"
       
       candidates
     end
