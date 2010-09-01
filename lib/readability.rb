@@ -333,15 +333,14 @@ module Readability
             el.set_attribute "rel", "nofollow"
           end
         else
-          # Otherwise, replace the element with its contents
-          unless el.children.nil?
-            # Still a valid element
-            el.swap(el.text)
-          else
-            debug "BUG: Invalid element trap."
-            # Element invalidated elsewhere
-            el.remove unless el.nil?
+          # Attempt to get text. If the element has invalid children, replace with ""
+          text_representation = ""
+          begin
+            text_representation = el.text
+          rescue
+            text_representation = ""
           end
+          el.swap(text_representation)
         end
       end
       
