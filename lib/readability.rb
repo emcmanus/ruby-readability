@@ -14,6 +14,11 @@ module Readability
       @input = input
       @options = options
       make_html
+      
+      if options[:score_images]
+        # Remove img from the test
+        REGEXES[:divToPElementsRe] = /<(a|blockquote|dl|div|ol|p|pre|table|ul)/i
+      end
     end
 
     def make_html
