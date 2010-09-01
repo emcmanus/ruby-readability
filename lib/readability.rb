@@ -205,8 +205,8 @@ module Readability
 
     def transform_misused_divs_into_paragraphs!
       @html.css("*").each do |elem|
-        debug("Testing ##{elem[:id]}.#{elem[:class]} for p transformation");
         if elem.name.downcase == "div"
+          debug("Testing DIV ##{elem[:id]}.#{elem[:class]} for p transformation");
           # transform <div>s that do not contain other block elements into <p>s
           if elem.inner_html !~ REGEXES[:divToPElementsRe]
             debug("Transforming div(##{elem[:id]}.#{elem[:class]}) to p");
