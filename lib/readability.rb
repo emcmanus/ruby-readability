@@ -269,6 +269,14 @@ module Readability
           counts["li"] -= 100
 
           content_length = el.text.strip.length  # Count the text length excluding any surrounding whitespace
+          
+          # Let's blow away the content_length requirement if the node contains any images
+          if options[:score_images]
+            if el.css("img").length > 0
+              content_length = (options[:min_text_length] || TEXT_LENGTH_THRESHOLD) + 1
+            end
+          end
+          
           link_density = get_link_density(el)
           to_remove = false
           reason = ""
@@ -337,7 +345,8 @@ module Readability
           begin
             el.swap(el.text)
           rescue
-            debug "WARN: Caught in the trap!!"
+            # This is a known bug. For some pages we can't swap an element with its text property.
+            debug "WARN: Caught in the trap!"
             el.swap("")
           end
         end
