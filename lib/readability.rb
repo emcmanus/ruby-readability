@@ -352,7 +352,7 @@ module Readability
               # Tag-specific attribute
               attribute_allowed = true
             end
-            el.delete(a) unless 
+            el.delete(a) unless attribute_allowed
             if options[:sanitize_links] and (a == "href" or a == "src")
               el.set_attribute a, resolve_relative_url(el.attribute(a).value)
               unless validates_url el.attribute(a)
