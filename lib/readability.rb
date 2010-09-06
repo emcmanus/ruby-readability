@@ -61,14 +61,13 @@ module Readability
       
       # Check the text length of the returned article, make sure it passes the threshold
       if remove_unlikely_candidates && article.text.strip.length < (options[:retry_length] || RETRY_LENGTH)
-        
-        # No need to re-run, we have content with an image
         if options[:score_images] && article.css('img').length > 0
+          # No need to re-run, we have content with an image
           return cleaned_article
+        else
+          make_html
+          return content(false)
         end
-        
-        make_html
-        return content(false)
       else
         return cleaned_article
       end
@@ -345,7 +344,15 @@ module Readability
         # If element is in whitelist, delete all its attributes
         if whitelist[el.node_name]
           el.attributes.each do |a, x|
-            el.delete(a) unless @options[:attributes] && @options[:attributes].include?(a.to_s)
+            attribute_allowed = false
+            if @options[:attributes] && @options[:attributes].include?(a.to_s)
+              # Global white-listed attribute
+              attribute_allowed = true
+            elsif @options[:tag_specific_attributes] && @options[:tag_specific_attributes][el.node_name].include?(a.to_s)
+              # Tag-specific attribute
+              attribute_allowed = true
+            end
+            el.delete(a) unless 
             if options[:sanitize_links] and (a == "href" or a == "src")
               el.set_attribute a, resolve_relative_url(el.attribute(a).value)
               unless validates_url el.attribute(a)
