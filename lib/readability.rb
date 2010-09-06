@@ -218,6 +218,8 @@ module Readability
         elsif (options[:resolve_relative_urls_with_path]||"") =~ SPECIAL_RULES[:hostRe] && str =~ SPECIAL_RULES[:unlikelyCandidatesRe]
           # Check for special cases
           debug("Special case: removing unlikely candidate - #{str}")
+          # elem.remove
+          elem.children.remove
           elem.remove
         end
       end
