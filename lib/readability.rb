@@ -29,7 +29,7 @@ module Readability
         :unlikelyCandidatesRe => /combx|comment|disqus|foot|header|menu|meta|nav|rss|shoutbox|sidebar|sponsor/i,
         :okMaybeItsACandidateRe => /and|article|body|column|main/i,
         :positiveRe => /article|body|content|entry|hentry|page|pagination|post|text/i,
-        :negativeRe => /combx|comment|contact|foot|footer|footnote|link|media|meta|promo|related|scroll|shoutbox|sponsor|tags|widget/i,
+        :negativeRe => /combx|comment|contact|foot|footer|footnote|link|media|meta|promo|related|scroll|shoutbox|sponsor|tags|widget|responses/i,
         :divToPElementsRe => /<(a|blockquote|dl|div|img|ol|p|pre|table|ul)/i,
         :replaceBrsRe => /(<br[^>]*>[ \n\r\t]*){2,}/i,
         :replaceFontsRe => /<(\/?)font[^>]*>/i,
@@ -37,6 +37,12 @@ module Readability
         :normalizeRe => /\s{2,}/,
         :killBreaksRe => /(<br\s*\/?>(\s|&nbsp;?)*){1,}/,
         :videoRe => /http:\/\/(www\.)?(youtube|vimeo)\.com/i
+    }
+    
+    # Apply these filters if hostRe matches
+    SPECIAL_RULES = {
+        :hostRe => /http:\/\/(www\.)?(buzzfeed)/i,
+        :unlikelyCandidatesRe => /contribution|response/
     }
 
     def content(remove_unlikely_candidates = true)
@@ -207,6 +213,10 @@ module Readability
         str = "#{elem[:class]}#{elem[:id]}"
         if str =~ REGEXES[:unlikelyCandidatesRe] && str !~ REGEXES[:okMaybeItsACandidateRe] && elem.name.downcase != 'body'
           debug("Removing unlikely candidate - #{str}")
+          elem.remove
+        elsif (options[:resolve_relative_urls_with_path]||"") =~ SPECIAL_RULES[:hostRe] && str =~ SPECIAL_RULES[:unlikelyCandidatesRs]
+          # Check for special cases
+          debug("Special case: removing unlikely candidate - #{str}")
           elem.remove
         end
       end
