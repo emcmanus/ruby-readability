@@ -348,7 +348,7 @@ module Readability
             if @options[:attributes] && @options[:attributes].include?(a.to_s)
               # Global white-listed attribute
               attribute_allowed = true
-            elsif @options[:tag_specific_attributes] && @options[:tag_specific_attributes][el.node_name].include?(a.to_s)
+            elsif @options[:tag_specific_attributes] && @options[:tag_specific_attributes][el.node_name] && @options[:tag_specific_attributes][el.node_name].include?(a.to_s)
               # Tag-specific attribute
               attribute_allowed = true
             end
