@@ -58,7 +58,15 @@ module Readability
       article = get_article(candidates, best_candidate)
 
       cleaned_article = sanitize(article, candidates, options)
+      
+      # Check the text length of the returned article, make sure it passes the threshold
       if remove_unlikely_candidates && article.text.strip.length < (options[:retry_length] || RETRY_LENGTH)
+        
+        # No need to re-run, we have content with an image
+        if options[:score_images] && article.css('img').length > 0
+          return cleaned_article
+        end
+        
         make_html
         return content(false)
       else
@@ -211,15 +219,12 @@ module Readability
     def remove_unlikely_candidates!
       @html.css("*").each do |elem|
         str = "#{elem[:class]}#{elem[:id]}"
-        debug "remove_unlikely_candidates - Checking #{str}"
         if str =~ REGEXES[:unlikelyCandidatesRe] && str !~ REGEXES[:okMaybeItsACandidateRe] && elem.name.downcase != 'body'
           debug("Removing unlikely candidate - #{str}")
           elem.remove
         elsif (options[:resolve_relative_urls_with_path]||"") =~ SPECIAL_RULES[:hostRe] && str =~ SPECIAL_RULES[:unlikelyCandidatesRe]
           # Check for special cases
           debug("Special case: removing unlikely candidate - #{str}")
-          # elem.remove
-          elem.children.remove
           elem.remove
         end
       end
