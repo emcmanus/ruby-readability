@@ -42,7 +42,7 @@ module Readability
     # Apply these filters if hostRe matches
     SPECIAL_RULES = {
         :hostRe => /http:\/\/(www\.)?(buzzfeed)/i,
-        :unlikelyCandidatesRe => /contribution|response/
+        :unlikelyCandidatesRe => /contribution|response/i
     }
 
     def content(remove_unlikely_candidates = true)
@@ -211,6 +211,7 @@ module Readability
     def remove_unlikely_candidates!
       @html.css("*").each do |elem|
         str = "#{elem[:class]}#{elem[:id]}"
+        debug "remove_unlikely_candidates - Checking #{str}"
         if str =~ REGEXES[:unlikelyCandidatesRe] && str !~ REGEXES[:okMaybeItsACandidateRe] && elem.name.downcase != 'body'
           debug("Removing unlikely candidate - #{str}")
           elem.remove
