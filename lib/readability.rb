@@ -7,7 +7,14 @@ module Readability
     IMAGE_AREA_THRESHOLD = 50000 # Every 50,000 pixels contributes TEXT_LENGTH_THRESHOLD to the node length score
     TEXT_LENGTH_THRESHOLD = 25
     RETRY_LENGTH = 250
-
+    
+    # TODO:
+    # - All the checks for options[:score_images] surround some poorly written code
+    # - Most of the score_images modifications are just site-specific tweaks to the score of an element
+    # - A PROPER implementation will pull out those lines and instead call a new function, get_content_length_with_images,
+    #   which is a drop-in replacement for elem.text.length but also score images based on their size. This should be much,
+    #   much easier to tweak, without throwing off the original readability "balance"
+    
     attr_accessor :options, :html
 
     def initialize(input, options = {})
@@ -122,6 +129,7 @@ module Readability
     def get_link_density(elem)
       link_length = elem.css("a").map {|i| i.text}.join("").length
       text_length = elem.text.length + 1    # Prevent division by 0, resulting in NaN
+      text_length += elem.css("img").length * 250 if options[:score_images]
       link_length / text_length.to_f
     end
 
@@ -287,7 +295,7 @@ module Readability
 
           content_length = el.text.strip.length  # Count the text length excluding any surrounding whitespace
           
-          # Let's blow away the content_length requirement if the node contains any images
+          # If the node contains any images, drop requirements
           if options[:score_images]
             if el.css("img").length > 0
               content_length = (options[:min_text_length] || TEXT_LENGTH_THRESHOLD) + 1
@@ -312,15 +320,15 @@ module Readability
           elsif counts["input"] > (counts["p"] / 3).to_i
             reason = "less than 3x <p>s than <input>s"
             to_remove = true
-          elsif content_length < (options[:min_text_length] || TEXT_LENGTH_THRESHOLD) && (counts["img"] == 0 || counts["img"] > 2)
+          elsif content_length < (options[:min_text_length] || TEXT_LENGTH_THRESHOLD) && counts["img"] == 0
             reason = "too short a content length without a single image"
             to_remove = true
           elsif weight < 25 && link_density > 0.2
             reason = "too many links for its weight (#{weight})"
-            to_remove = true
+            to_remove = true unless options[:score_images] && counts["img"] > 0
           elsif weight >= 25 && link_density > 0.5
             reason = "too many links for its weight (#{weight})"
-            to_remove = true
+            to_remove = true unless options[:score_images] && counts["img"] > 0
           elsif (counts["embed"] == 1 && content_length < 75) || counts["embed"] > 1
             reason = "<embed>s with too short a content length, or too many <embed>s"
             to_remove = true
